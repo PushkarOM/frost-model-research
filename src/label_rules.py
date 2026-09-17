@@ -140,22 +140,3 @@ def build_labels_for_horizon(
     out["frost_label_broad"] = broads
     out["frost_label_strict"] = stricts
     return out
-
-
-def label_both_variants(
-    future_temp_window: pd.Series,
-    future_rh_mean_percent_window: pd.Series,
-    temp_threshold: float = DEFAULT_TEMP_THRESHOLD_C,
-    td_threshold: float = DEFAULT_TD_THRESHOLD_C,
-) -> dict:
-    """
-    Convenience wrapper returning both variants at once, so notebooks
-    compute (and are therefore more likely to actually report) both
-    rather than silently picking just one.
-    """
-    return {
-        "frost_label_broad": label_tmin_only(future_temp_window, temp_threshold),
-        "frost_label_strict": label_tmin_and_td(
-            future_temp_window, future_rh_mean_percent_window, temp_threshold, td_threshold
-        ),
-    }

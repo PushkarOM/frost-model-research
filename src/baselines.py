@@ -71,11 +71,22 @@ class PhysicalThresholdBaseline:
 
     @staticmethod
     def _select_columns(df: pd.DataFrame) -> List[str]:
+        """
+        A candidate column is used only if it's both present AND fully
+        populated (no NaN) in `df`. The "present" check alone isn't enough
+        once `df` can span multiple cities: pd.concat-ing cities with
+        different available columns (e.g. Basel has no wind_speed) fills
+        the gaps with NaN rather than dropping the column, and
+        LinearRegression raises on NaN input rather than silently ignoring
+        it. Checking "no NaN" here means a multi-city table automatically
+        (and correctly) falls back to whatever subset of physical features
+        every included city actually has, instead of crashing.
+        """
         candidates = ["temp_min", "dew_point_depression_c", "cloud_cover", "wind_speed"]
-        cols = [c for c in candidates if c in df.columns]
+        cols = [c for c in candidates if c in df.columns and df[c].notna().all()]
         if "temp_min" not in cols:
             raise ValueError(
-                "PhysicalThresholdBaseline requires a 'temp_min' column."
+                "PhysicalThresholdBaseline requires a fully-populated 'temp_min' column."
             )
         return cols
 
