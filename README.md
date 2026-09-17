@@ -110,7 +110,11 @@ this doesn't get silently fed into a dew-point formula at the wrong scale.
 - [x] Phase 1 baselines: persistence, physical/threshold, logistic
       regression, all logged to `experiments/runs.csv`
       (`src/baselines.py`, `03_baselines.ipynb`)
-- [ ] Phase 2: feature engineering notebook (`04_feature_engineering.ipynb`)
+- [x] Phase 2: feature engineering across 4 cities (Basel, Oslo,
+      Perpignan, De Bilt), train/val/test tables saved to `data/processed/`
+      (`04_feature_engineering.ipynb`) — a plain linear-regression sanity
+      check already beats persistence (MAE 1.99°C vs 2.11°C), a good sign
+      heading into Phase 3
 - [ ] Phase 3: RF/XGBoost/LightGBM/CatBoost models (`src/models.py`,
       `05_model_training.ipynb`)
 - [ ] Regional calibration on Tier 3 data (`06_regional_calibration.ipynb`)
