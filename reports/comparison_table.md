@@ -40,11 +40,68 @@ threshold.
 
 ## Phase 2 — Feature-engineered models
 
-*(Not yet run — `04_feature_engineering.ipynb` not started.)*
+*(No separate model comparison in Phase 2 — that notebook's job was
+building the train/val/test tables Phase 3 uses below. A quick linear-
+regression sanity check on the engineered features did beat plain
+persistence, MAE 1.99°C vs 2.11°C — see `04_feature_engineering.ipynb`.)*
 
 ## Phase 3 — RF / XGBoost / LightGBM / CatBoost
 
-*(Not yet run — `05_model_training.ipynb` not started.)*
+**Basis:** 4 cities (Basel, Oslo, Perpignan, De Bilt), date-based
+train/test split (test = 2008-07-01 onward), broad label
+(`frost_label_broad`, `Tmin < 3°C`), no hyperparameter tuning yet
+(`val.csv` reserved for that). Persistence is re-run on this exact test
+set below the Phase 1 table, since the numbers above were computed on
+Basel alone and are **not directly comparable** to what follows.
+
+| Model | Precision | Recall | F1 | Peirce skill | RMSE (°C) | MAE (°C) |
+|---|---|---|---|---|---|---|
+| Persistence (4-city test set) | 0.836 | 0.832 | 0.834 | 0.769 | 2.76 | 2.11 |
+| Random Forest | 0.878 | 0.835 | 0.856 | 0.790 | 2.18 | 1.72 |
+| XGBoost | 0.887 | 0.846 | 0.866 | 0.805 | 2.13 | 1.68 |
+| LightGBM | 0.885 | 0.846 | 0.865 | 0.804 | 2.14 | 1.68 |
+| CatBoost | 0.882 | 0.851 | **0.866** | **0.807** | 2.16 | 1.71 |
+
+All four beat Persistence on both MAE and Peirce skill, on the same
+4-city test data. Differences *between* the four models are modest at
+this untuned stage — XGBoost/LightGBM edge ahead on MAE, CatBoost
+edges ahead on Peirce/recall, but none of this should be read as
+"X is the best model" until a real hyperparameter search has run on
+`val.csv`.
+
+### Feature importance (Repo B's sensor-decision deliverable)
+
+Separate run, full feature set (including `wind_speed`/`wind_gust`/
+`cloud_cover`/`sunshine`, all with per-city gaps), LightGBM
+(NaN-tolerant), **gain-based** importance (not the default split-count
+metric, which overweights continuous variables like wind purely for
+having more distinct values to split on — a real trap worth naming since
+it's exactly the question being asked):
+
+| Feature | Share of total gain |
+|---|---|
+| `temp_mean` | 89.9% |
+| `temp_min` | 1.85% |
+| `temp_min_roll7_mean` | 1.32% |
+| `dew_point_c` | 0.86% |
+| `temp_max` | 0.56% |
+| `wind_speed` | 0.49% (rank 6 of 30) |
+| `cloud_cover` | 0.49% |
+| ... | |
+| `wind_gust` | 0.18% (rank 17 of 30) |
+
+**`temp_mean` dominating this heavily echoes (in a more extreme form)
+Omazić et al. (2024)'s finding that Tmin alone carried about half their
+model's total importance** — a temperature-family variable dominating is
+consistent with the literature, not a red flag specific to this pipeline.
+
+**Wind verdict for Repo B, stated plainly and provisionally:** a
+dedicated anemometer looks like "nice to have, not must-have" on this
+data — a real but small contribution (~0.5% of total gain), dominated by
+temperature history. **This is a first-pass answer on mid-latitude
+European data, not a final one** — re-check once Tier 3 (Warora-region)
+data exists before committing to a hardware decision, since local climate
+dynamics may weight wind differently there.
 
 ## Literature reference points (not directly comparable — different
 data, regions, horizons, and label definitions; positioning only, not a

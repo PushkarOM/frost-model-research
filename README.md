@@ -115,8 +115,11 @@ this doesn't get silently fed into a dew-point formula at the wrong scale.
       (`04_feature_engineering.ipynb`) — a plain linear-regression sanity
       check already beats persistence (MAE 1.99°C vs 2.11°C), a good sign
       heading into Phase 3
-- [ ] Phase 3: RF/XGBoost/LightGBM/CatBoost models (`src/models.py`,
-      `05_model_training.ipynb`)
+- [x] Phase 3: RF/XGBoost/LightGBM/CatBoost models — all beat Persistence
+      on the same 4-city test set (`src/models.py`,
+      `05_model_training.ipynb`); feature importance run, wind flagged as
+      "nice-to-have, not must-have" for Repo B pending Tier 3 confirmation
+- [ ] Hyperparameter tuning on `val.csv` (currently unused)
 - [ ] Regional calibration on Tier 3 data (`06_regional_calibration.ipynb`)
 - [ ] `src/export_model.py`, feature-importance handoff to Repo B
 - [ ] Inference latency/memory benchmark on the actual Pi
