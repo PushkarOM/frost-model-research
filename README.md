@@ -119,9 +119,15 @@ this doesn't get silently fed into a dew-point formula at the wrong scale.
       on the same 4-city test set (`src/models.py`,
       `05_model_training.ipynb`); feature importance run, wind flagged as
       "nice-to-have, not must-have" for Repo B pending Tier 3 confirmation
-- [ ] Hyperparameter tuning on `val.csv` (currently unused)
+- [x] Hyperparameter tuning on `val.csv` — done, honestly: did NOT
+      improve on untuned defaults within this search budget (see
+      `reports/comparison_table.md`)
+- [x] `src/export_model.py`, feature-importance handoff to Repo B —
+      `models/v1_model.cbm` + `models/v1_metadata.json` exported.
+      **Not yet deployable as-is**: trained with one-hot city columns
+      that don't exist at a single deployment site — flagged explicitly
+      in the metadata, not silently left as a surprise for Repo B
 - [ ] Regional calibration on Tier 3 data (`06_regional_calibration.ipynb`)
-- [ ] `src/export_model.py`, feature-importance handoff to Repo B
 - [ ] Inference latency/memory benchmark on the actual Pi
 
 ## Setup

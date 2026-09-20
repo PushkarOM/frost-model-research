@@ -62,6 +62,33 @@ Basel alone and are **not directly comparable** to what follows.
 | LightGBM | 0.885 | 0.846 | 0.865 | 0.804 | 2.14 | 1.68 |
 | CatBoost | 0.882 | 0.851 | **0.866** | **0.807** | 2.16 | 1.71 |
 
+### Hyperparameter tuning — did it help? No.
+
+Tuned on `val.csv` (a modest, non-exhaustive grid; RF's search was
+limited to an offline run due to a single-core dev environment), then
+evaluated once on the held-out test set:
+
+| Model | Untuned Peirce | Tuned Peirce |
+|---|---|---|
+| Random Forest | 0.790 | 0.785 |
+| XGBoost | 0.805 | 0.803 |
+| LightGBM | 0.804 | 0.798 |
+| CatBoost | **0.807** | 0.804 |
+
+Every tuned result is marginally *below* its untuned counterpart —
+differences small enough to plausibly be noise. Honest conclusion:
+default hyperparameters were already reasonable at this data scale; a
+larger search on multi-core hardware is future work, not a claim this
+search already exhausted the possibilities. **Model exported: untuned
+CatBoost** (`models/v1_model.cbm` + `models/v1_metadata.json`).
+
+**Important, concrete limitation of this export, not a generic one:**
+its feature list includes one-hot columns for the 4 European training
+cities. A single Warora deployment will never populate any of them — this
+exact artifact cannot run there as-is. Retraining on Tier 3 data without
+cross-city one-hot features is required before this is deployable, not
+just before it's validated on Indian data.
+
 All four beat Persistence on both MAE and Peirce skill, on the same
 4-city test data. Differences *between* the four models are modest at
 this untuned stage — XGBoost/LightGBM edge ahead on MAE, CatBoost
